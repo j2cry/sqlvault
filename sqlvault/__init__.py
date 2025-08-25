@@ -3,7 +3,7 @@ from sqlvault.vault import SQLVault
 from sqlvault.vault import SQLSingleVault
 
 
-VERSION: Final = '0.0.1'
+VERSION: Final = '0.0.3'
 
 
 __all__ = [

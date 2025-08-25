@@ -67,8 +67,9 @@ def check(method):
 
     @wraps(method)
     def decorator(self, tablename: str, *args, **kwargs):
-        if self._metadata.schema:
-            tablename = f'{self._metadata.schema}.{tablename}'  # noqa: WPS237
+        schema = self._metadata.schema
+        if schema and not tablename.startswith(schema):
+            tablename = f'{schema}.{tablename}'
         if tablename not in self._metadata.tables:
             raise KeyError('No such table found: %s', tablename)
         return method(self, tablename, *args, **kwargs)
@@ -329,6 +330,9 @@ class SQLSingleVault[KeyType, ValueType](SQLVault):
         interface = cls.__new__(cls)
         for slot in parent.__slots__:
             setattr(interface, slot, getattr(parent, slot))
+        schema = parent._metadata.schema
+        if schema and not tablename.startswith(schema):
+            tablename = f'{schema}.{tablename}'
         interface.tablename = tablename
         return interface
 
