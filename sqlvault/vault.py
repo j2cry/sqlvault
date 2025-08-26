@@ -68,7 +68,7 @@ def check(method):
     @wraps(method)
     def decorator(self, tablename: str, *args, **kwargs):
         schema = self._metadata.schema
-        if schema and not tablename.startswith(schema):
+        if schema and not tablename.startswith(f'{schema}.'):
             tablename = f'{schema}.{tablename}'
         if tablename not in self._metadata.tables:
             raise KeyError('No such table found: %s', tablename)
@@ -318,6 +318,8 @@ class SQLSingleVault[KeyType, ValueType](SQLVault):
         **kwargs: Unpack[SQLVaultKeywordArguments],
     ):
         super().__init__(connection_string, [table], schema, **kwargs)
+        if schema and not table.startswith(f'{schema}.'):
+            table = f'{schema}.{table}'
         self.tablename = table
 
     def __len__(self) -> int:
@@ -331,7 +333,7 @@ class SQLSingleVault[KeyType, ValueType](SQLVault):
         for slot in parent.__slots__:
             setattr(interface, slot, getattr(parent, slot))
         schema = parent._metadata.schema
-        if schema and not tablename.startswith(schema):
+        if schema and not tablename.startswith(f'{schema}.'):
             tablename = f'{schema}.{tablename}'
         interface.tablename = tablename
         return interface
