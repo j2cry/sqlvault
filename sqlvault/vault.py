@@ -152,7 +152,7 @@ class SQLVault:
                 table,
                 self._metadata,
                 sa.Column(
-                    'key',
+                    'keyhash',
                     sa.LargeBinary(
                         kwargs.get('unique_index_length', UNIQUE_INDEX_LENGTH)
                     ),
@@ -232,20 +232,20 @@ class SQLVault:
         table = self._metadata.tables[tablename]
         rowvalue = dict(
             zip(
-                (table.c.key, table.c.value, table.c.dtype),
+                (table.c.keyhash, table.c.value, table.c.dtype),
                 (keyhash, *self.serialize(value)),
             )
         )
         with self._engine.begin() as conn:
             # check if value exists
             row = conn.execute(
-                sa.select(table).where(table.c.key == keyhash),
+                sa.select(table).where(table.c.keyhash == keyhash),
             ).first()
             # insert/update
             if row is None:
                 querypart = sa.insert(table)
             else:
-                querypart = sa.update(table).where(table.c.key == keyhash)
+                querypart = sa.update(table).where(table.c.keyhash == keyhash)
             conn.execute(querypart.values(rowvalue))
         self._getvalue.clear_cache(tablename, key)
 
@@ -256,7 +256,7 @@ class SQLVault:
         table = self._metadata.tables[tablename]
         with self._engine.begin() as conn:
             conn.execute(
-                sa.delete(table).where(table.c.key == keyhash),
+                sa.delete(table).where(table.c.keyhash == keyhash),
             )
         self._getvalue.clear_cache(tablename, key)
 
@@ -298,7 +298,7 @@ class SQLVault:
         table = self._metadata.tables[tablename]
         with self._engine.connect() as conn:
             row = conn.execute(
-                sa.select(table).where(table.c.key == self._hashfactory(key)),
+                sa.select(table).where(table.c.keyhash == self._hashfactory(key)),
             ).first()
         if row is None:
             raise KeyError(key)
