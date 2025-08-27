@@ -19,7 +19,7 @@ class SQLVault(SQLVaultBase):
 
     :param tables:
         Collection of table names without schema or quotation; missing tables will be created.
-        If the table name starts with a underscore `_`, it will be handled as _secure_ table without storing the key itself.
+        If the table name starts with an underscore `_`, it will be handled as _secure_ table without storing the key itself.
     :type tables: Sequence[str]
 
     :param schema:
@@ -109,7 +109,42 @@ class SQLVault(SQLVaultBase):
 
 # ==========================================================================================
 class SQLSingleVault[KeyType, ValueType](SQLVaultBase):
-    """Simplified interface for sinle-table SQL key-value vault"""
+    """Simplified interface for sinle-table SQL key-value vault
+
+    :param connection_string:
+        SQLAlchemy connection string.
+    :type connection_string: str
+
+    :param table:
+        Table name without schema or quotation; will be created if missing.
+        If the table name starts with an underscore `_`, it will be handled as _secure_ table without storing the key itself.
+    :type tables: Sequence[str]
+
+    :param schema:
+        SQL schema name (if supported and required), must exist in the database.
+        Use database default if not provided.
+    :type schema: str
+
+    :param serializer:
+        User-defined serializer for values.
+    :type serializer: Serializer
+
+    :param cache_size:
+        Maximal vault cache size.
+    :type cache_size:  int
+
+    :param hashfunc:
+        Hash function for HashFactory
+    :type hashfunc: HashFunction
+
+    :param hashfactory_cache_size:
+        maximal HashFactory cache size
+    :type hashfactory_cache_size: int
+
+    :param unique_index_length:
+        maximal size of key field
+    :type unique_index_length: int
+    """
 
     __slots__ = ('_tablename',)
 
