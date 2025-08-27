@@ -33,27 +33,27 @@ VALUES: Final = (
 def test_get_default(vault: SQLVault):
     """Get missing key"""
     with pytest.raises(KeyError):
-        vault.getvalue('T1', 'missing-key')
+        vault['T1', 'missing-key']
     missing, default = object(), object()
-    assert vault.getvalue('T1', missing, default) == default
+    assert vault.get('T1', missing, default) == default
 
 
 @pytest.mark.parametrize(('key', 'value'), VALUES)
 def test_set_value(vault: SQLVault, key: Any, value: Any):
     """Set value"""
-    vault.setvalue('T2', key, value)
+    vault['T2', key] = value
 
 
 def test_length(vault: SQLVault):
     """Check length"""
-    assert vault.length('T1') == 0
-    assert vault.length('T2') == len(VALUES)
+    assert len(vault.interface('T1')) == 0
+    assert len(vault.interface('T2')) == len(VALUES)
 
 
 @pytest.mark.parametrize(('key', 'value'), VALUES)
 def test_get_value(vault: SQLVault, key: Any, value: Any):
     """Get value"""
-    assert value == vault.getvalue('T2', key, value)
+    assert value == vault.get('T2', key, value)
 
 
 @pytest.mark.parametrize(
@@ -65,21 +65,21 @@ def test_get_value(vault: SQLVault, key: Any, value: Any):
 )
 def test_has_value(vault: SQLVault, key: Any, result: bool):
     """Set value"""
-    assert vault.hasvalue('T2', key) == result
+    assert (('T2', key) in vault) == result
 
 
 @pytest.mark.parametrize(('key', 'result'), VALUES)
 def test_pop_value(vault: SQLVault, key: Any, result: Any):
     """Pop missing key"""
-    rvalue = vault.popvalue('T2', key)
+    rvalue = vault.pop('T2', key)
     assert rvalue == result
     with pytest.raises(KeyError):
-        vault.popvalue('T2', key)
+        vault.pop('T2', key)
 
 
 def test_del_value(vault: SQLVault):
     """Pop missing key"""
     key, value = object(), object()
-    vault.setvalue('T1', key, value)
-    vault.delvalue('T1', key)
-    assert not vault.hasvalue('T1', key)
+    vault['T1', key] = value
+    del vault['T1', key]  # noqa: WPS420
+    assert ('T1', key) not in vault

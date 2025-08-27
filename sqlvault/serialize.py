@@ -7,12 +7,12 @@ from typing import Any, Callable, Concatenate, Final, Protocol, final
 class Serialization(enum.IntEnum):
     """Data serialization type"""
 
-    OBJECT = -1
-    """Object is serialized with user-defined serializer"""
-    BINARY = 0
-    """Object is not (already) serialized"""
-    UNICODE = enum.auto()
+    BINARY = 1
+    """Object does not require serialization"""
+    UNICODE = 2
     """Object is serialized as UTF-8 string"""
+    OBJECT = 255
+    """Object is serialized with user-defined serializer"""
 
 
 @final
